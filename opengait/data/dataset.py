@@ -32,6 +32,7 @@ class DataSet(tordata.Dataset):
         return len(self.seqs_info)
 
     def __loader__(self, paths):
+        print(paths)
         paths = sorted(paths)
         data_list = []
         for pth in paths:
@@ -53,6 +54,7 @@ class DataSet(tordata.Dataset):
 
     def __getitem__(self, idx):
         if not self.cache:
+            print(self.seqs_info[idx][-1])
             data_list = self.__loader__(self.seqs_info[idx][-1])
         elif self.seqs_data[idx] is None:
             data_list = self.__loader__(self.seqs_info[idx][-1])
