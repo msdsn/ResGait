@@ -173,20 +173,39 @@ class Baseline(nn.Module):
             {'type': 'RandomErasing', 'prob': 0.3}
         ]
         self.trainer_trfs = get_transform(trf_cfg)
+        # data_cnfg = {
+        #     'cache': False,
+        #     'dataset_root': './CASIA-B-pkl',
+        #     'dataset_partition': './datasets/CASIA-B/CASIA-B.json',
+        # }
+        # self.train_dataset = DataSet(data_cnfg, training=True)
+        # self.train_sampler = TripletSampler(self.train_dataset, batch_size=[8, 16], batch_shuffle=True)
+        # collate_cfg = {
+        #     'sample_type': 'fixed_unordered',
+        #     'frames_num_fixed': 30,
+        # }
+        # self.collate_fn = CollateFn(self.train_dataset.label_set, collate_cfg)
+        # self.train_loader = torch.utils.data.DataLoader(self.train_dataset, sampler=self.train_sampler, collate_fn=self.collate_fn, num_workers=1)
         data_cnfg = {
             'cache': False,
             'dataset_root': './CASIA-B-pkl',
             'dataset_partition': './datasets/CASIA-B/CASIA-B.json',
         }
-        self.train_dataset = DataSet(data_cnfg, training=True)
-        self.train_sampler = TripletSampler(self.train_dataset, batch_size=[8, 16], batch_shuffle=True)
+        dataset = DataSet(data_cnfg, True)
+        sampler = TripletSampler(dataset, batch_shuffle=True, batch_size=[8, 16])
+
         collate_cfg = {
             'sample_type': 'fixed_unordered',
             'frames_num_fixed': 30,
         }
-        self.collate_fn = CollateFn(self.train_dataset.label_set, collate_cfg)
-        self.train_loader = torch.utils.data.DataLoader(self.train_dataset, sampler=self.train_sampler, collate_fn=self.collate_fn, num_workers=1)
+    
+        self.collate_fn = CollateFn(dataset.label_set, collate_cfg)
 
+        self.train_loader = torch.utils.data.DataLoader(
+            dataset=dataset,
+            batch_sampler=sampler,
+            collate_fn=self.collate_fn,
+            num_workers=1)
         self.device = torch.distributed.get_rank()
         torch.cuda.set_device(self.device)
         self.to(device=torch.device(
