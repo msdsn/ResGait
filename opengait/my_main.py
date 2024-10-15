@@ -2,7 +2,7 @@ from modeling.loss_aggregator import LossAggregator
 from data.dataset import DataSet
 from data.sampler import TripletSampler
 from data.transform import get_transform
-from data.collate_fn import CollateFn
+from data.collate_fn2 import CollateFn
 import torch.nn.functional as F
 import torch
 from einops import rearrange
