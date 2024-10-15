@@ -185,7 +185,7 @@ class Baseline(nn.Module):
             'frames_num_fixed': 30,
         }
         self.collate_fn = CollateFn(self.train_dataset.label_set, collate_cfg)
-        self.train_loader = torch.utils.data.DataLoader(self.train_dataset, sampler=self.train_sampler, collate_fn=self.collate_fn, num_workers=4)
+        self.train_loader = torch.utils.data.DataLoader(self.train_dataset, sampler=self.train_sampler, collate_fn=self.collate_fn, num_workers=1)
 
         self.device = torch.distributed.get_rank()
         torch.cuda.set_device(self.device)
