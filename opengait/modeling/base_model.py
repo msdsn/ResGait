@@ -204,6 +204,10 @@ class BaseModel(MetaModel, nn.Module):
 
     def get_loader(self, data_cfg, train=True):
         sampler_cfg = self.cfgs['trainer_cfg']['sampler'] if train else self.cfgs['evaluator_cfg']['sampler']
+        print("sampler_cfg calismak uzere")
+        print(sampler_cfg)
+        print("data_cfg calismak uzere")
+        print(data_cfg)
         dataset = DataSet(data_cfg, train)
 
         Sampler = get_attr_from([Samplers], sampler_cfg['type'])
