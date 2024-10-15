@@ -54,7 +54,7 @@ class DataSet(tordata.Dataset):
 
     def __getitem__(self, idx):
         if not self.cache:
-            print(self.seqs_info[idx][-1])
+            print(idx)
             data_list = self.__loader__(self.seqs_info[idx][-1])
         elif self.seqs_data[idx] is None:
             data_list = self.__loader__(self.seqs_info[idx][-1])
