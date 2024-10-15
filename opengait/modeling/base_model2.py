@@ -136,7 +136,7 @@ class BaseModel(MetaModel, nn.Module):
         self.iteration = 0
         self.engine_cfg = cfgs['trainer_cfg'] if training else cfgs['evaluator_cfg']
         
-        self.train_loader = self.get_loader(cfgs['data_cfg'], train=True)
+        self.train_loader = self.get_loader()
         
 
         self.device = torch.distributed.get_rank()
@@ -155,36 +155,27 @@ class BaseModel(MetaModel, nn.Module):
     def init_parameters(self):
         pass
 
-    def get_loader(self, data_cfg, train=True):
-        sampler_cfg = self.cfgs['trainer_cfg']['sampler'] if train else self.cfgs['evaluator_cfg']['sampler']
-        print("sampler_cfg calismak uzere")
-        print(sampler_cfg)
-        print("data_cfg calismak uzere")
-        print(data_cfg)
+    def get_loader(self):
         data_cnfg = {
             'cache': False,
             'dataset_root': './CASIA-B-pkl',
             'dataset_partition': './datasets/CASIA-B/CASIA-B.json',
         }
-        dataset = DataSet(data_cnfg, train)
-        
-        Sampler = get_attr_from([Samplers], sampler_cfg['type'])
-        vaild_args = get_valid_args(Sampler, sampler_cfg, free_keys=[
-            'sample_type', 'type'])
+        dataset = DataSet(data_cnfg, True)
         sampler = TripletSampler(dataset, batch_shuffle=True, batch_size=[8, 16])
 
         collate_cfg = {
             'sample_type': 'fixed_unordered',
             'frames_num_fixed': 30,
         }
-        collate_cfg2 = {'batch_shuffle': True, 'batch_size': [8, 16], 'frames_num_fixed': 30, 'frames_num_max': 40, 'frames_num_min': 20, 'sample_type': 'fixed_unordered', 'type': 'TripletSampler'}
+    
         self.collate_fn = CollateFn(dataset.label_set, collate_cfg)
 
         loader = tordata.DataLoader(
             dataset=dataset,
             batch_sampler=sampler,
             collate_fn=self.collate_fn,
-            num_workers=data_cfg['num_workers'])
+            num_workers=1)
         return loader
 
     def get_optimizer(self, optimizer_cfg):
