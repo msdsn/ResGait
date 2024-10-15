@@ -43,6 +43,7 @@ class TripletSampler(tordata.sampler.Sampler):
                 total_batch_size - len(sample_indices))]
 
             sample_indices = sample_indices[self.rank:total_size:self.world_size]
+            print(f"sample_indices: {sample_indices}")
             yield sample_indices
 
     def __len__(self):
