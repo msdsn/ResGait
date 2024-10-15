@@ -9,33 +9,10 @@ class CollateFn(object):
         self.label_set = label_set
         sample_type = sample_config['sample_type']
         sample_type = sample_type.split('_')
-        self.sampler = sample_type[0]
-        self.ordered = sample_type[1]
-        if self.sampler not in ['fixed', 'unfixed', 'all']:
-            raise ValueError
-        if self.ordered not in ['ordered', 'unordered']:
-            raise ValueError
-        self.ordered = sample_type[1] == 'ordered'
-
-        # fixed cases
-        if self.sampler == 'fixed':
-            print("1. if")
-            self.frames_num_fixed = sample_config['frames_num_fixed']
-
-        # unfixed cases
-        if self.sampler == 'unfixed':
-            print("2. if")
-            self.frames_num_max = sample_config['frames_num_max']
-            self.frames_num_min = sample_config['frames_num_min']
-
-        if self.sampler != 'all' and self.ordered:
-            print("3. if")
-            self.frames_skip_num = sample_config['frames_skip_num']
-
+        self.sampler = 'fixed'
+        self.ordered = False
+        self.frames_num_fixed = sample_config['frames_num_fixed']
         self.frames_all_limit = -1
-        if self.sampler == 'all' and 'frames_all_limit' in sample_config:
-            print("4. if")
-            self.frames_all_limit = sample_config['frames_all_limit']
 
     def __call__(self, batch):
         batch_size = len(batch)
