@@ -173,10 +173,16 @@ class Baseline(nn.Module):
         self.build_network()
         self.init_parameters()
         trf_cfg = [
-            {'type': 'BaseSilCuttingTransform'},
-            {'type': 'RandomRotate', 'prob': 0.3},
-            {'type': 'RandomErasing', 'prob': 0.3}
+            {
+                'type': 'Compose', 
+                'trf_cfg': [
+                    {'type': 'BaseSilCuttingTransform'}, 
+                    {'type': 'RandomRotate', 'prob': 0.3}, 
+                    {'type': 'RandomErasing', 'prob': 0.3}
+                ]
+            }
         ]
+         
         self.trainer_trfs = get_transform(trf_cfg)
         data_cnfg = {
             'cache': False,
