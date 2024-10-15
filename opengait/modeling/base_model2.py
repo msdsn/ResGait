@@ -178,7 +178,7 @@ class BaseModel(MetaModel, nn.Module):
             'frames_num_fixed': 30,
         }
         collate_cfg2 = {'batch_shuffle': True, 'batch_size': [8, 16], 'frames_num_fixed': 30, 'frames_num_max': 40, 'frames_num_min': 20, 'sample_type': 'fixed_unordered', 'type': 'TripletSampler'}
-        self.collate_fn = CollateFn(self.train_dataset.label_set, collate_cfg2)
+        self.collate_fn = CollateFn(dataset.label_set, collate_cfg2)
 
         loader = tordata.DataLoader(
             dataset=dataset,
