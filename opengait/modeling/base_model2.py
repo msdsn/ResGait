@@ -160,7 +160,12 @@ class BaseModel(MetaModel, nn.Module):
         print(sampler_cfg)
         print("data_cfg calismak uzere")
         print(data_cfg)
-        dataset = DataSet(data_cfg, train)
+        data_cnfg = {
+            'cache': False,
+            'dataset_root': './CASIA-B-pkl',
+            'dataset_partition': './datasets/CASIA-B/CASIA-B.json',
+        }
+        dataset = DataSet(data_cnfg, train)
 
         Sampler = get_attr_from([Samplers], sampler_cfg['type'])
         vaild_args = get_valid_args(Sampler, sampler_cfg, free_keys=[
