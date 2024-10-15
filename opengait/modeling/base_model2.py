@@ -173,10 +173,16 @@ class BaseModel(MetaModel, nn.Module):
             'sample_type', 'type'])
         sampler = TripletSampler(dataset, batch_shuffle=True, batch_size=[8, 16])
 
+        collate_cfg = {
+            'sample_type': 'fixed_unordered',
+            'frames_num_fixed': 30,
+        }
+        self.collate_fn = CollateFn(self.train_dataset.label_set, collate_cfg)
+
         loader = tordata.DataLoader(
             dataset=dataset,
             batch_sampler=sampler,
-            collate_fn=CollateFn(dataset.label_set, sampler_cfg),
+            collate_fn=self.collate_fn,
             num_workers=data_cfg['num_workers'])
         return loader
 
