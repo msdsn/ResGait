@@ -25,7 +25,7 @@ from abc import abstractmethod
 from . import backbones
 from .loss_aggregator import LossAggregator
 from data.transform import get_transform
-from data.collate_fn import CollateFn
+from data.collate_fn2 import CollateFn
 from data.dataset import DataSet
 import data.sampler as Samplers
 from data.sampler import TripletSampler
