@@ -190,7 +190,7 @@ class Baseline(nn.Module):
             'dataset_partition': './datasets/CASIA-B/CASIA-B.json',
         }
         dataset = DataSet(data_cnfg, True)
-        sampler = TripletSampler(dataset, batch_shuffle=True, batch_size=[8, 16])
+        sampler = TripletSampler(dataset, batch_shuffle=True, batch_size=[8, 8])
 
         collate_cfg = {
             'sample_type': 'fixed_unordered',
