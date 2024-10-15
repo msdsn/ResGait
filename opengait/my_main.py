@@ -390,6 +390,7 @@ def run_model(cfgs):
         model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
     if cfgs['trainer_cfg']['fix_BN']:
         model.fix_BN()
+    print(f"loss config: {cfgs['loss_cfg']}")
     model = get_ddp_module(model, cfgs['trainer_cfg']['find_unused_parameters'])
     msg_mgr.log_info(params_count(model))
     msg_mgr.log_info("Model Initialization Finished!")
