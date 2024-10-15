@@ -279,7 +279,7 @@ class Baseline(nn.Module):
             seqs = seqs_batch[0]
             seqs = seqs.unsqueeze(2)
             print(f"seqs: {seqs.shape}")
-            labs = torch.tensor(labs_batch).long().cuda().squeeze(1)
+            labs = torch.tensor(labs_batch).long().cuda()
             print(f"labs: {labs.shape}")
             with autocast():
                 outs = model([seqs, labs, None, None])
