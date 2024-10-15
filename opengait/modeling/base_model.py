@@ -144,6 +144,7 @@ class BaseModel(MetaModel, nn.Module):
 
         self.build_network(cfgs['model_cfg'])
         self.init_parameters()
+        print(f"cfgs['trainer_cfg']['transform']=> {cfgs['trainer_cfg']['transform']}")
         self.trainer_trfs = get_transform(cfgs['trainer_cfg']['transform'])
 
         self.msg_mgr.log_info(cfgs['data_cfg'])
