@@ -225,7 +225,7 @@ class Baseline(nn.Module):
         ]
         self.loss_aggregator = LossAggregator(loss_cfg)
         self.optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, self.parameters()), lr=0.1, momentum=0.9, weight_decay=0.0005)
-
+        self.Scaler = GradScaler()
     def build_network(self):
         self.Backbone = Resnet9()
         self.Backbone = SetBlockWrapper(self.Backbone)
@@ -316,6 +316,7 @@ class Baseline(nn.Module):
     @ staticmethod
     def run_train(model):
         print("train loader calismak uzere")
+        iter= 0
         for inputs in model.train_loader:
             ipts, labs, typs, vies, seqL = model.inputs_pretreament(inputs)
             #seqs_batch = torch.tensor(seqs_batch).float().cuda()
@@ -332,8 +333,14 @@ class Baseline(nn.Module):
                 del outs
             loss_sum, loss_info = model.loss_aggregator(training_feat)
             print(f"loss_sum: {loss_sum}")
-            
-            break
+            print(f"loss_info: {loss_info}")
+            model.optimizer.zero_grad()
+            model.Scaler.scale(loss_sum).backward()
+            model.Scaler.step(model.optimizer)
+            model.Scaler.update()
+            iter += 1
+            if iter >= 1000:
+                break
 import os
 import argparse
 import torch
