@@ -28,6 +28,7 @@ from data.transform import get_transform
 from data.collate_fn import CollateFn
 from data.dataset import DataSet
 import data.sampler as Samplers
+from data.sampler import TripletSampler
 from utils import Odict, mkdir, ddp_all_gather
 from utils import get_valid_args, is_list, is_dict, np2var, ts2np, list2var, get_attr_from
 from evaluation import evaluator as eval_functions
@@ -166,11 +167,11 @@ class BaseModel(MetaModel, nn.Module):
             'dataset_partition': './datasets/CASIA-B/CASIA-B.json',
         }
         dataset = DataSet(data_cnfg, train)
-
+        
         Sampler = get_attr_from([Samplers], sampler_cfg['type'])
         vaild_args = get_valid_args(Sampler, sampler_cfg, free_keys=[
             'sample_type', 'type'])
-        sampler = Sampler(dataset, **vaild_args)
+        sampler = TripletSampler(dataset, batch_shuffle=True, batch_size=[8, 16])
 
         loader = tordata.DataLoader(
             dataset=dataset,
