@@ -221,6 +221,7 @@ class Baseline(nn.Module):
                 'log_prefix': 'softmax',
                 'scale': 16,
                 'loss_term_weight': 1.0,
+                'log_accuracy': True,
             }
         ]
         self.loss_aggregator = LossAggregator(loss_cfg)
