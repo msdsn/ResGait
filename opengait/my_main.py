@@ -322,6 +322,7 @@ class Baseline(nn.Module):
         for inputs in model.train_loader:
             ipts, labs, typs, vies, seqL = model.inputs_pretreament(inputs)
             #seqs_batch = torch.tensor(seqs_batch).float().cuda()
+            model.optimizer.zero_grad()
             print(f"len ipts: {len(ipts)}")
             print(f"ipts.0 shape: {ipts[0].shape}")
             print(f"labs shape: {labs.shape}")
@@ -329,14 +330,13 @@ class Baseline(nn.Module):
             seqs = seqs.unsqueeze(2)
             print(f"seqs: {seqs.shape}")
             #labs = torch.tensor(labs_batch).long().cuda()
-            with autocast():
+            with autocast(enabled=True):
                 outs = model([seqs, labs, None, None])
                 training_feat = outs['training_feat']
                 del outs
             loss_sum, loss_info = model.loss_aggregator(training_feat)
             print(f"loss_sum: {loss_sum}")
             print(f"loss_info: {loss_info}")
-            model.optimizer.zero_grad()
             model.Scaler.scale(loss_sum).backward()
             model.Scaler.step(model.optimizer)
             model.Scaler.update()
@@ -392,7 +392,7 @@ def run_model(cfgs):
     if cfgs['trainer_cfg']['fix_BN']:
         model.fix_BN()
     print(f"loss config: {cfgs['loss_cfg']}")
-    model = get_ddp_module(model, cfgs['trainer_cfg']['find_unused_parameters'])
+    model = get_ddp_module(model, True)#)
     msg_mgr.log_info(params_count(model))
     msg_mgr.log_info("Model Initialization Finished!")
 
