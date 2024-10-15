@@ -262,6 +262,7 @@ class Baseline(nn.Module):
 
     @ staticmethod
     def run_train(model):
+        print("train loader calismak uzere")
         for inputs in model.train_loader:
             seqs_batch, labs_batch, typs_batch, vies_batch, seqL_batch = inputs
             seqs_batch = torch.tensor(seqs_batch).float().cuda()

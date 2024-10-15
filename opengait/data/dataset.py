@@ -65,6 +65,7 @@ class DataSet(tordata.Dataset):
         return data_list, seq_info
 
     def __load_all_data(self):
+        print("llll")
         for idx in range(len(self)):
             self.__getitem__(idx)
 
