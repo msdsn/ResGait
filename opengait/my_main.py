@@ -282,6 +282,7 @@ class Baseline(nn.Module):
         """
         seqs_batch, labs_batch, typs_batch, vies_batch, seqL_batch = inputs
         seq_trfs = self.trainer_trfs if self.training else self.evaluator_trfs
+        print(f"len(seqs_batch): {len(seqs_batch)}, len(seq_trfs): {len(seq_trfs)}")
         if len(seqs_batch) != len(seq_trfs):
             raise ValueError(
                 "The number of types of input data and transform should be same. But got {} and {}".format(len(seqs_batch), len(seq_trfs)))
