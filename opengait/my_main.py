@@ -162,6 +162,9 @@ class SeparateBNNecks(nn.Module):
         else:
             logits = feature.matmul(self.fc_bin)
         return feature.permute(1, 2, 0).contiguous(), logits.permute(1, 2, 0).contiguous()
+    
+from torch.cuda.amp import autocast
+from torch.cuda.amp import GradScaler
 class Baseline(nn.Module):
     def __init__(self):
         super(Baseline, self).__init__()
@@ -173,19 +176,6 @@ class Baseline(nn.Module):
             {'type': 'RandomErasing', 'prob': 0.3}
         ]
         self.trainer_trfs = get_transform(trf_cfg)
-        # data_cnfg = {
-        #     'cache': False,
-        #     'dataset_root': './CASIA-B-pkl',
-        #     'dataset_partition': './datasets/CASIA-B/CASIA-B.json',
-        # }
-        # self.train_dataset = DataSet(data_cnfg, training=True)
-        # self.train_sampler = TripletSampler(self.train_dataset, batch_size=[8, 16], batch_shuffle=True)
-        # collate_cfg = {
-        #     'sample_type': 'fixed_unordered',
-        #     'frames_num_fixed': 30,
-        # }
-        # self.collate_fn = CollateFn(self.train_dataset.label_set, collate_cfg)
-        # self.train_loader = torch.utils.data.DataLoader(self.train_dataset, sampler=self.train_sampler, collate_fn=self.collate_fn, num_workers=1)
         data_cnfg = {
             'cache': False,
             'dataset_root': './CASIA-B-pkl',
@@ -286,6 +276,18 @@ class Baseline(nn.Module):
             seqs_batch, labs_batch, typs_batch, vies_batch, seqL_batch = inputs
             seqs_batch = torch.tensor(seqs_batch).float().cuda()
             print(f"seqs_batch: {seqs_batch.shape}")
+            seqs = seqs_batch[0]
+            seqs = seqs.unsqueeze(2)
+            print(f"seqs: {seqs.shape}")
+            labs = torch.tensor(labs_batch).long().cuda().squeeze(1)
+            print(f"labs: {labs.shape}")
+            with autocast():
+                outs = model([seqs, labs, None, None])
+                training_feat = outs['training_feat']
+                del outs
+            loss_sum, loss_info = model.loss_aggregator(training_feat)
+            print(f"loss_sum: {loss_sum}")
+            
             break
 import os
 import argparse
