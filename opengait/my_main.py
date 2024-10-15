@@ -319,7 +319,7 @@ class Baseline(nn.Module):
         for inputs in model.train_loader:
             ipts, labs, typs, vies, seqL = model.inputs_pretreament(inputs)
             #seqs_batch = torch.tensor(seqs_batch).float().cuda()
-            print(f"ipts shape: {ipts.shape}")
+            print(f"len ipts: {len(ipts)}")
             print(f"ipts.0 shape: {ipts[0].shape}")
             print(f"labs shape: {labs.shape}")
             #seqs = seqs_batch[0]
