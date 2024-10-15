@@ -165,6 +165,8 @@ class SeparateBNNecks(nn.Module):
     
 from torch.cuda.amp import autocast
 from torch.cuda.amp import GradScaler
+from utils import np2var, list2var
+import numpy as np
 class Baseline(nn.Module):
     def __init__(self):
         super(Baseline, self).__init__()
@@ -269,24 +271,61 @@ class Baseline(nn.Module):
                     nn.init.normal_(m.weight.data, 1.0, 0.02)
                     nn.init.constant_(m.bias.data, 0.0)
 
+
+    def inputs_pretreament(self, inputs):
+        """Conduct transforms on input data.
+
+        Args:
+            inputs: the input data.
+        Returns:
+            tuple: training data including inputs, labels, and some meta data.
+        """
+        seqs_batch, labs_batch, typs_batch, vies_batch, seqL_batch = inputs
+        seq_trfs = self.trainer_trfs if self.training else self.evaluator_trfs
+        if len(seqs_batch) != len(seq_trfs):
+            raise ValueError(
+                "The number of types of input data and transform should be same. But got {} and {}".format(len(seqs_batch), len(seq_trfs)))
+        requires_grad = bool(self.training)
+        seqs = [np2var(np.asarray([trf(fra) for fra in seq]), requires_grad=requires_grad).float()
+                for trf, seq in zip(seq_trfs, seqs_batch)]
+
+        typs = typs_batch
+        vies = vies_batch
+
+        labs = list2var(labs_batch).long()
+
+        if seqL_batch is not None:
+            seqL_batch = np2var(seqL_batch).int()
+        seqL = seqL_batch
+
+        if seqL is not None:
+            seqL_sum = int(seqL.sum().data.cpu().numpy())
+            ipts = [_[:, :seqL_sum] for _ in seqs]
+        else:
+            ipts = seqs
+        del seqs
+        return ipts, labs, typs, vies, seqL
+
     @ staticmethod
     def run_train(model):
         print("train loader calismak uzere")
         for inputs in model.train_loader:
-            seqs_batch, labs_batch, typs_batch, vies_batch, seqL_batch = inputs
-            seqs_batch = torch.tensor(seqs_batch).float().cuda()
-            print(f"seqs_batch: {seqs_batch.shape}")
-            seqs = seqs_batch[0]
-            seqs = seqs.unsqueeze(2)
-            print(f"seqs: {seqs.shape}")
-            labs = torch.tensor(labs_batch).long().cuda()
+            ipts, labs, typs, vies, seqL = model.inputs_pretreament(inputs)
+            #seqs_batch = torch.tensor(seqs_batch).float().cuda()
+            print(f"ipts shape: {ipts.shape}")
+            print(f"ipts.0 shape: {ipts[0].shape}")
+            print(f"labs shape: {labs.shape}")
+            #seqs = seqs_batch[0]
+            #seqs = seqs.unsqueeze(2)
+            #print(f"seqs: {seqs.shape}")
+            #labs = torch.tensor(labs_batch).long().cuda()
             print(f"labs: {labs.shape}")
-            with autocast():
-                outs = model([seqs, labs, None, None])
-                training_feat = outs['training_feat']
-                del outs
-            loss_sum, loss_info = model.loss_aggregator(training_feat)
-            print(f"loss_sum: {loss_sum}")
+            #with autocast():
+            #    outs = model([seqs, labs, None, None])
+            #    training_feat = outs['training_feat']
+            #    del outs
+            #loss_sum, loss_info = model.loss_aggregator(training_feat)
+            #print(f"loss_sum: {loss_sum}")
             
             break
 import os
