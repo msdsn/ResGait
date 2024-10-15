@@ -322,17 +322,16 @@ class Baseline(nn.Module):
             print(f"len ipts: {len(ipts)}")
             print(f"ipts.0 shape: {ipts[0].shape}")
             print(f"labs shape: {labs.shape}")
-            #seqs = seqs_batch[0]
-            #seqs = seqs.unsqueeze(2)
-            #print(f"seqs: {seqs.shape}")
+            seqs = ipts[0]
+            seqs = seqs.unsqueeze(2)
+            print(f"seqs: {seqs.shape}")
             #labs = torch.tensor(labs_batch).long().cuda()
-            print(f"labs: {labs.shape}")
-            #with autocast():
-            #    outs = model([seqs, labs, None, None])
-            #    training_feat = outs['training_feat']
-            #    del outs
-            #loss_sum, loss_info = model.loss_aggregator(training_feat)
-            #print(f"loss_sum: {loss_sum}")
+            with autocast():
+                outs = model([seqs, labs, None, None])
+                training_feat = outs['training_feat']
+                del outs
+            loss_sum, loss_info = model.loss_aggregator(training_feat)
+            print(f"loss_sum: {loss_sum}")
             
             break
 import os
