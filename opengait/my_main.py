@@ -1,10 +1,8 @@
 from modeling.loss_aggregator import LossAggregator
-from data.dataset import Dataset
+from data.dataset import DataSet
 from data.sampler import TripletSampler
 from data.transform import get_transform
 from data.collate_fn import CollateFn
-#import sgd optimizer
-from torch.optim import SGD
 import torch.nn.functional as F
 import torch
 from einops import rearrange
@@ -180,7 +178,7 @@ class Baseline(nn.Module):
             'dataset_root': './CASIA-B-pkl',
             'dataset_partition': './datasets/CASIA-B/CASIA-B.json',
         }
-        self.train_dataset = Dataset(data_cnfg, training=True)
+        self.train_dataset = DataSet(data_cnfg, training=True)
         self.train_sampler = TripletSampler(self.train_dataset, batch_size=[8, 16], batch_shuffle=True)
         collate_cfg = {
             'sample_type': 'fixed_unordered',
